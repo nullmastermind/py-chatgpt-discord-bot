@@ -16,7 +16,7 @@ def get_buttons(
         async def on_timeout(self):
             for child in self.children:
                 child.disabled = True
-            await self.message.edit(view=self)
+            await self.message.edit(view=None)
 
         async def handle(self, interaction, temperature: float):
             await interaction.response.send_message("**🔄 Regenerate 🔄**")
