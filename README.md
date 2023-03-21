@@ -12,9 +12,9 @@ Discord BOT: NullGPT#0657
 - /text_improver
 
 ### Options:
-- prompt
-- temperature
-- history
-- max_tokens
+- prompt: required
+- temperature: default in config.py
+- history: default 0
+- max_tokens: default 1000
 
 ![alt text](asssets/img.png)
