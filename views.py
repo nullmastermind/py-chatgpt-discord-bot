@@ -11,12 +11,11 @@ def get_buttons(
 ):
     class RegenerateView(discord.ui.View):
         def __init__(self):
-            super().__init__(timeout=10)  # specify the timeout here
+            super().__init__(timeout=120)
 
         async def on_timeout(self):
             for child in self.children:
                 child.disabled = True
-            await self.message.edit(content="You took too long!", view=self)
 
         async def handle(self, interaction, temperature: float):
             await interaction.response.send_message("**🔄 Regenerate 🔄**")
