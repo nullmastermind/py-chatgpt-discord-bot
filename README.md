@@ -3,4 +3,13 @@
 
 Discord BOT: NullGPT#0657
 
+### Bot commands
+- /code
+- /assistant
+- /english_translator
+- /english_translator_technical
+- /english_teacher
+- /text_improver
+
+
 ![alt text](asssets/img.png)
