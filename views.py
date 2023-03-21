@@ -19,9 +19,6 @@ def get_buttons(
             await self.message.edit(view=self)
 
         async def handle(self, interaction, temperature: float):
-            for child in self.children:
-                child.disabled = True
-            await self.message.edit(view=self)
             await interaction.response.send_message("**🔄 Regenerate 🔄**")
             await process_command(
                 bot=bot,
