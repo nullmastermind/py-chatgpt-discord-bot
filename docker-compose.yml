@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  chatgpt_telegram_bot:
+  chatgpt_discord_bot:
     container_name: chatgpt_discord_bot
     command: python3 main.py
     restart: always
