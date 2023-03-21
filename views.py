@@ -19,7 +19,7 @@ def get_buttons(
             await self.message.edit(view=None)
 
         async def handle(self, interaction, temperature: float):
-            await interaction.response.send_message("🔄 **REGENERATE**")
+            await interaction.response.send_message("🔄 /*regenerate*")
             await process_command(
                 bot=bot,
                 command_name=command_name,
