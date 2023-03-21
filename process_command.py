@@ -56,12 +56,12 @@ async def process_command(
             histories[author].pop(0)
 
     await respond_fn(
-        "`/{}` prompt: ```{}``` *temperature={}, history={}, max_tokens={}*".format(
+        "> /{}: temperature={}, history={}, max_tokens={} ```{}```".format(
             command_name,
-            prompt,
             temperature,
             history,
             max_tokens,
+            prompt,
         ),
         view=get_buttons(
             bot=bot,
