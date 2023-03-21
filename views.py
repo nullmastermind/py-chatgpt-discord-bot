@@ -32,7 +32,7 @@ def get_buttons(
                 is_regenerate=True,
             )
 
-        @discord.ui.button(label="0.0 (Precise 🧠)", emoji="🔄")
+        @discord.ui.button(label="0.0 (Precise 🧠)")
         async def regenerate_button_callback_00(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.0)
 
