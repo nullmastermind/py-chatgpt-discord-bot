@@ -95,18 +95,22 @@ async def process_command(
 
         if history > 0 and len(histories[author]) > 0:
             num_pass_his = history
+            history_messages = []
             for i in range(0, history):
                 if num_pass_his <= 0:
                     break
                 index = len(histories[author]) - i - 1
                 if len(histories[author]) > index >= 0:
-                    messages.append(
+                    history_messages.append(
                         {
                             "role": histories[author][index]["role"],
                             "content": histories[author][index]["content"],
                         }
                     )
-                    num_pass_his -= 1
+                    if histories[author][index]["role"] == "user":
+                        num_pass_his -= 1
+            for msg in history_messages[::-1]:
+                messages.append(msg)
 
         messages.append({"role": "user", "content": prompt})
 
