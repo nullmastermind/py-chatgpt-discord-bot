@@ -3,7 +3,7 @@
 
 Discord BOT: NullGPT#0657
 
-### Bot commands
+### Bot commands:
 - /code
 - /assistant
 - /english_translator
@@ -11,5 +11,10 @@ Discord BOT: NullGPT#0657
 - /english_teacher
 - /text_improver
 
+### Options:
+- prompt
+- temperature
+- history
+- max_tokens
 
 ![alt text](asssets/img.png)
