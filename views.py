@@ -40,7 +40,7 @@ def get_buttons(
         async def regenerate_button_callback_02(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.2)
 
-        @discord.ui.button(label="0.5 (Balanced 🧘)")
+        @discord.ui.button(label="0.5 (Balanced ⚖️)")
         async def regenerate_button_callback_05(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.5)
 
