@@ -56,7 +56,7 @@ async def process_command(
             histories[author].pop(0)
 
     await respond_fn(
-        "`/{}` prompt: ```{}```\n*temperature={}, history={}, max_tokens={}*".format(
+        "`/{}` prompt: ```{}```*temperature={}, history={}, max_tokens={}*".format(
             command_name,
             prompt,
             temperature,
