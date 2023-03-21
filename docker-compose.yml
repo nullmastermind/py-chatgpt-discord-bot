@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  chatgpt_telegram_bot:
+    container_name: chatgpt_discord_bot
+    command: python3 main.py
+    restart: always
+    environment:
+      BOT_TOKEN: <YOUR_BOT_TOKEN>
+      OPENAI_API_KEY: <YOUR_OPENAI_API_KEY>
+    build:
+      context: "."
+      dockerfile: Dockerfile
