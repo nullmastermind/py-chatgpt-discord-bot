@@ -56,7 +56,7 @@ async def process_command(
             histories[author].pop(0)
 
     await respond_fn(
-        "> /{}: temperature={}, history={}, max_tokens={} ```{}```".format(
+        ">>> /{}: temperature={}, history={}, max_tokens={} ```{}```".format(
             command_name,
             temperature,
             history,
