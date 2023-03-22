@@ -76,6 +76,7 @@ async def process_command(
     message = await ctx.send("...")
     answer = ""
     trim_answer = ""
+    full_answer = ""
     try:
         start_time = time.time()
         options = {
@@ -121,7 +122,9 @@ async def process_command(
             **options,
         ):
             if "content" in r.choices[0]["delta"]:
-                answer += r.choices[0]["delta"]["content"]
+                stream_message = r.choices[0]["delta"]["content"]
+                answer += stream_message
+                full_answer += stream_message
                 trim_answer = answer.strip()
                 if trim_answer.count("```") % 2 == 1:
                     trim_answer += "```"
@@ -146,14 +149,14 @@ async def process_command(
                         print("i: {}, {}", i, prompt)
                         histories[author][i] = {
                             "role": "assistant",
-                            "content": trim_answer,
+                            "content": full_answer.strip(),
                             "prompt": prompt,
                         }
             else:
                 histories[author].append(
                     {
                         "role": "assistant",
-                        "content": trim_answer,
+                        "content": full_answer.strip(),
                         "prompt": prompt,
                     },
                 )
