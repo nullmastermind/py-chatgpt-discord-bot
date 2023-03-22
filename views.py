@@ -12,7 +12,7 @@ def get_buttons(
 ):
     class RegenerateView(discord.ui.View):
         def __init__(self):
-            super().__init__(timeout=3 * 60)
+            super().__init__(timeout=5 * 60)
 
         async def on_timeout(self):
             for child in self.children:
