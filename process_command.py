@@ -20,12 +20,22 @@ histories = {
         },
     ]
 }
+continue_histories = {
+    "nil": [
+        {
+            "role": "user",
+            "content": "",
+            "prompt": "",
+        },
+    ]
+}
 
 
-def get_history_description(author: str, history: int):
-    if history == 0:
-        return ""
-
+def get_history_description(
+    author: str,
+    history: int,
+    continue_conv: bool = False,
+):
     messages = []
 
     if author in histories and history > 0 and len(histories[author]) > 0:
@@ -46,6 +56,19 @@ def get_history_description(author: str, history: int):
                     num_pass_his -= 1
         for msg in history_messages[::-1]:
             messages.append(msg)
+    else:
+        if (
+            author in continue_histories
+            and continue_conv
+            and len(continue_histories[author]) > 0
+        ):
+            for msg in continue_histories[author]:
+                messages.append(
+                    {
+                        "role": msg["role"],
+                        "content": msg["content"],
+                    }
+                )
 
     str_messages = []
 
@@ -69,8 +92,9 @@ async def process_command(
     author: str = None,
     is_regenerate: bool = False,
     origin_data=None,
+    continue_conv: bool = False,
 ):
-    global histories
+    global histories, continue_histories
 
     if author is None or len(author) == 0:
         author = str(ctx.author)
@@ -90,6 +114,13 @@ async def process_command(
         "prompt": prompt,
     }
     append_to_history = False
+    append_to_continue_history = False
+
+    if not is_regenerate:
+        if author not in continue_histories or not continue_conv:
+            continue_histories[author] = [history_message]
+        elif continue_conv:
+            append_to_continue_history = True
 
     if author not in histories:
         histories[author] = [history_message]
@@ -103,7 +134,11 @@ async def process_command(
         history_description = origin_data["history_description"]
         messages = origin_data["messages"]
     else:
-        history_description = get_history_description(author=author, history=history)
+        history_description = get_history_description(
+            author=author,
+            history=history,
+            continue_conv=continue_conv,
+        )
         messages = [
             {
                 "role": "system",
@@ -132,15 +167,25 @@ async def process_command(
                         num_pass_his -= 1
             for msg in history_messages[::-1]:
                 messages.append(msg)
+        else:
+            if continue_conv and len(continue_histories[author]) > 0:
+                for msg in continue_histories[author]:
+                    messages.append(
+                        {
+                            "role": msg["role"],
+                            "content": msg["content"],
+                        }
+                    )
 
         messages.append({"role": "user", "content": prompt})
 
     await respond_fn(
-        ">>> /{}: temperature={}, history={}, max_tokens={} ```{}``` {}".format(
+        ">>> /{}: temperature={}, history={}, max_tokens={}, continue_conv={} ```{}``` {}".format(
             command_name,
             temperature,
             history,
             max_tokens,
+            continue_conv,
             prompt,
             "Timeline: ```diff\n{}\n+ user: {}```".format(
                 history_description,
@@ -177,6 +222,8 @@ async def process_command(
 
         if append_to_history:
             histories[author].append(history_message)
+        if append_to_continue_history:
+            continue_histories[author].append(history_message)
 
         for r in openai.ChatCompletion.create(
             model=MODEL,
@@ -214,8 +261,25 @@ async def process_command(
                             "content": full_answer.strip(),
                             "prompt": prompt,
                         }
+                for i in range(0, len(continue_histories[author])):
+                    if (
+                        continue_histories[author][i]["prompt"] == prompt
+                        and continue_histories[author][i]["role"] == "assistant"
+                    ):
+                        continue_histories[author][i] = {
+                            "role": "assistant",
+                            "content": full_answer.strip(),
+                            "prompt": prompt,
+                        }
             else:
                 histories[author].append(
+                    {
+                        "role": "assistant",
+                        "content": full_answer.strip(),
+                        "prompt": prompt,
+                    },
+                )
+                continue_histories[author].append(
                     {
                         "role": "assistant",
                         "content": full_answer.strip(),

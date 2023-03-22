@@ -8,6 +8,7 @@ COMMAND_CODE_TEMPLATE = """
         temperature: float = prompts["{COMMAND_NAME}"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -17,6 +18,7 @@ COMMAND_CODE_TEMPLATE = """
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 """
 FILE_TEMPLATE = """

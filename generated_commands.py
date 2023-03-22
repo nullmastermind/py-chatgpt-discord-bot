@@ -10,6 +10,7 @@ def generated_commands(bot, prompts, process_command):
         temperature: float = prompts["code"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -19,6 +20,7 @@ def generated_commands(bot, prompts, process_command):
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 
 
@@ -29,6 +31,7 @@ def generated_commands(bot, prompts, process_command):
         temperature: float = prompts["assistant"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -38,6 +41,7 @@ def generated_commands(bot, prompts, process_command):
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 
 
@@ -48,6 +52,7 @@ def generated_commands(bot, prompts, process_command):
         temperature: float = prompts["english_translator"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -57,6 +62,7 @@ def generated_commands(bot, prompts, process_command):
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 
 
@@ -67,6 +73,7 @@ def generated_commands(bot, prompts, process_command):
         temperature: float = prompts["english_translator_technical"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -76,6 +83,7 @@ def generated_commands(bot, prompts, process_command):
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 
 
@@ -86,6 +94,7 @@ def generated_commands(bot, prompts, process_command):
         temperature: float = prompts["english_teacher"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -95,6 +104,7 @@ def generated_commands(bot, prompts, process_command):
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 
 
@@ -105,6 +115,7 @@ def generated_commands(bot, prompts, process_command):
         temperature: float = prompts["text_improver"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
+        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -114,5 +125,6 @@ def generated_commands(bot, prompts, process_command):
             temperature=temperature,
             history=history,
             max_tokens=max_tokens,
+            continue_conv=continue_conv,
         )
 
