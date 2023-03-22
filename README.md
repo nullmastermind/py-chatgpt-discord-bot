@@ -49,4 +49,4 @@ Discord BOT: NullGPT#0657
 
 ## Youtube video
 
-[![IMAGE ALT TEXT HERE](asssets/img.png)](https://www.youtube.com/watch?v=ZwSu8f1DKmI)
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/ZwSu8f1DKmI/0.jpg)](https://www.youtube.com/watch?v=ZwSu8f1DKmI)
