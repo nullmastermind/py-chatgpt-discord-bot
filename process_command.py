@@ -197,6 +197,23 @@ async def process_command(
         view=None,
     )
 
+    def get_current_buttons():
+        return (
+            get_buttons(
+                bot=bot,
+                process_command=process_command,
+                command_name=command_name,
+                prompt=prompt,
+                history=history,
+                max_tokens=max_tokens,
+                origin_data={
+                    "history_description": history_description,
+                    "messages": messages,
+                    "temperature": temperature,
+                },
+            ),
+        )
+
     message = await ctx.send("...")
     answer = ""
     trim_answer = ""
@@ -275,37 +292,7 @@ async def process_command(
                         "prompt": prompt,
                     },
                 )
-        await message.edit(
-            content=trim_answer,
-            view=get_buttons(
-                bot=bot,
-                process_command=process_command,
-                command_name=command_name,
-                prompt=prompt,
-                history=history,
-                max_tokens=max_tokens,
-                origin_data={
-                    "history_description": history_description,
-                    "messages": messages,
-                    "temperature": temperature,
-                },
-            ),
-        )
+        await message.edit(content=trim_answer, view=get_current_buttons())
     except Exception as e:
         trim_answer += "\n\n{}".format(e)
-        await message.edit(
-            content=trim_answer,
-            view=get_buttons(
-                bot=bot,
-                process_command=process_command,
-                command_name=command_name,
-                prompt=prompt,
-                history=history,
-                max_tokens=max_tokens,
-                origin_data={
-                    "history_description": history_description,
-                    "messages": messages,
-                    "temperature": temperature,
-                },
-            ),
-        )
+        await message.edit(content=trim_answer, view=get_current_buttons())
