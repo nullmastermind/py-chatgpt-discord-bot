@@ -40,6 +40,8 @@ Discord BOT: NullGPT#0657
 - /english_teacher
 - /text_improver
 
+You can easily add or delete as desired in [config.py](https://github.com/nullmastermind/py-chatgpt-discord-bot/blob/master/config.py)
+
 ## Options:
 
 - prompt: required
