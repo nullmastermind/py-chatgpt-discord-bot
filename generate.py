@@ -5,10 +5,10 @@ COMMAND_CODE_TEMPLATE = """
     async def command_{COMMAND_NAME}(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["{COMMAND_NAME}"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
