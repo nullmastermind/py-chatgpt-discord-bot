@@ -21,6 +21,8 @@ def get_buttons(
 
         async def handle(self, interaction, temperature: float):
             await interaction.response.send_message("🔄 /*regenerate*")
+            if temperature == -1:
+                temperature = origin_data["temperature"]
             await process_command(
                 bot=bot,
                 command_name=command_name,

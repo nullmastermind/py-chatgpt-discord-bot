@@ -7,10 +7,10 @@ def generated_commands(bot, prompts, process_command):
     async def command_code(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["code"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -28,10 +28,10 @@ def generated_commands(bot, prompts, process_command):
     async def command_assistant(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["assistant"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -49,10 +49,10 @@ def generated_commands(bot, prompts, process_command):
     async def command_english_translator(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["english_translator"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -70,10 +70,10 @@ def generated_commands(bot, prompts, process_command):
     async def command_english_translator_technical(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["english_translator_technical"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -91,10 +91,10 @@ def generated_commands(bot, prompts, process_command):
     async def command_english_teacher(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["english_teacher"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
@@ -112,10 +112,10 @@ def generated_commands(bot, prompts, process_command):
     async def command_text_improver(
         ctx,
         prompt: str,
+        continue_conv: bool = False,
         temperature: float = prompts["text_improver"]["temperature"],
         history: int = 0,
         max_tokens: int = 1000,
-        continue_conv: bool = False,
     ):
         await process_command(
             bot=bot,
