@@ -50,8 +50,11 @@ def get_history_description(author: str, history: int):
     str_messages = []
 
     for msg in messages:
+        role = "# {}".format(msg["role"])
+        if msg["role"] == "user":
+            role = "+ user"
         str_messages.append(
-            "{}: {}".format(msg["role"], cut_string_to_json(msg["content"]))
+            "{}: {}".format(role, cut_string_to_json(msg["content"]))
         )
 
     return "{}".format("\n".join(str_messages)).strip()
@@ -106,7 +109,7 @@ async def process_command(
             history,
             max_tokens,
             prompt,
-            "Timeline: ```{}\nuser: {}```".format(
+            "Timeline: ```{}\n+ user: {}```".format(
                 history_description,
                 cut_string_to_json(prompt),
             )
