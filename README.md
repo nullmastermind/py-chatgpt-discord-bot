@@ -1,5 +1,7 @@
 ```diff
-! I am very interested in this repository, so you don't need to worry if there hasn't been an update for a while. Simply put, it is still functioning stably without the need for updates.
+! I am very interested in this repository, so you don't need to worry if there
+! hasn't been an update for a while. Simply put, it is still functioning stably
+! without the need for updates.
 ```
 
 - To deploy the stable version, modify the environment variables in the docker-compose file or replace .env.example with .env to run locally. Execute `docker compose up --build -d` command. I have not had the time to write documentation yet.
