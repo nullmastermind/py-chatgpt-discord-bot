@@ -146,7 +146,6 @@ async def process_command(
                         histories[author][i]["prompt"] == prompt
                         and histories[author][i]["role"] == "assistant"
                     ):
-                        print("i: {}, {}", i, prompt)
                         histories[author][i] = {
                             "role": "assistant",
                             "content": full_answer.strip(),
