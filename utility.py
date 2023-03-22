@@ -25,8 +25,8 @@ def preprocess_prompt(prompt: str):
     return prompt.replace("\\n", "\n")
 
 
-def cut_string_to_json(string):
-    if len(string) > 30:
-        string = string[:30] + "..."
-    json_string = json.dumps(string)
-    return json_string
+def cut_string_to_json(string: str):
+    string = string.replace("\n", " ").replace("`", "")
+    if len(string) > 50:
+        string = string[:50] + "..."
+    return string

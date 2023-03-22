@@ -3,7 +3,12 @@ import time
 import openai
 
 from config import OPENAI_COMPLETION_OPTIONS, CHAT_BOT_NAME, PROMPTS, MODEL, MAX_HISTORY
-from utility import is_message_limit, break_answer, preprocess_prompt
+from utility import (
+    is_message_limit,
+    break_answer,
+    preprocess_prompt,
+    cut_string_to_json,
+)
 from views import get_buttons
 
 histories = {
@@ -15,6 +20,41 @@ histories = {
         },
     ]
 }
+
+
+def get_history_description(author: str, history: int):
+    if history == 0:
+        return ""
+
+    messages = []
+
+    if author in histories and history > 0 and len(histories[author]) > 0:
+        num_pass_his = history
+        history_messages = []
+        for i in range(0, history):
+            if num_pass_his <= 0:
+                break
+            index = len(histories[author]) - i - 1
+            if len(histories[author]) > index >= 0:
+                history_messages.append(
+                    {
+                        "role": histories[author][index]["role"],
+                        "content": histories[author][index]["content"],
+                    }
+                )
+                if histories[author][index]["role"] == "user":
+                    num_pass_his -= 1
+        for msg in history_messages[::-1]:
+            messages.append(msg)
+
+    str_messages = []
+
+    for msg in messages:
+        str_messages.append(
+            "{}: {}".format(msg["role"], cut_string_to_json(msg["content"]))
+        )
+
+    return "{}".format("\n".join(str_messages)).strip()
 
 
 async def process_command(
@@ -42,26 +82,36 @@ async def process_command(
         return
 
     prompt = preprocess_prompt(prompt)
+    history_message = {
+        "role": "user",
+        "content": prompt,
+        "prompt": prompt,
+    }
+    append_to_history = False
 
     if author not in histories:
-        histories[author] = [
-            {
-                "role": "user",
-                "content": prompt,
-                "prompt": prompt,
-            },
-        ]
+        histories[author] = [history_message]
     else:
+        if not is_regenerate:
+            append_to_history = True
         if len(histories[author]) >= MAX_HISTORY:
             histories[author].pop(0)
 
+    history_description = get_history_description(author=author, history=history)
+
     await respond_fn(
-        ">>> /{}: temperature={}, history={}, max_tokens={} ```{}```".format(
+        ">>> /{}: temperature={}, history={}, max_tokens={} ```{}``` {}".format(
             command_name,
             temperature,
             history,
             max_tokens,
             prompt,
+            "Timeline: ```{}\nuser: {}```".format(
+                history_description,
+                cut_string_to_json(prompt),
+            )
+            if len(history_description) > 0
+            else "",
         ),
         view=get_buttons(
             bot=bot,
@@ -114,6 +164,9 @@ async def process_command(
                 messages.append(msg)
 
         messages.append({"role": "user", "content": prompt})
+
+        if append_to_history:
+            histories[author].append(history_message)
 
         for r in openai.ChatCompletion.create(
             model=MODEL,
