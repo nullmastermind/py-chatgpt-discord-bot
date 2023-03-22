@@ -8,7 +8,7 @@
 
 If you need an additional bot on Telegram, you may like this repository: https://github.com/karfly/chatgpt_telegram_bot
 
-Discord BOT: NullGPT#0657
+Discord BOT: NullGPT#0657 https://discord.gg/kCwPAGj9Rc
 
 ## Features
 
