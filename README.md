@@ -45,9 +45,10 @@ You can easily add or delete as desired in [config.py](https://github.com/nullma
 
 ## Options:
 
+- continue_conv <True/False>: Continue the conversation
 - prompt: required
 - temperature: default in config.py
-- history: default 0
+- history: default 0. If this option is used, it will disable the 'continue_conv' option.
 - max_tokens: default 1000
 
 ## Youtube video
