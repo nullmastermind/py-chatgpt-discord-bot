@@ -8,6 +8,7 @@ def get_buttons(
     prompt: str,
     history: int = 0,
     max_tokens: int = 1000,
+    origin_data=None,
 ):
     class RegenerateView(discord.ui.View):
         def __init__(self):
@@ -30,6 +31,7 @@ def get_buttons(
                 max_tokens=max_tokens,
                 author=str(interaction.user),
                 is_regenerate=True,
+                origin_data=origin_data,
             )
 
         @discord.ui.button(label="0.0 (Precise 🧠)")

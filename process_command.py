@@ -53,9 +53,7 @@ def get_history_description(author: str, history: int):
         role = "# {}".format(msg["role"])
         if msg["role"] == "user":
             role = "+ user"
-        str_messages.append(
-            "{}: {}".format(role, cut_string_to_json(msg["content"]))
-        )
+        str_messages.append("{}: {}".format(role, cut_string_to_json(msg["content"])))
 
     return "{}".format("\n".join(str_messages)).strip()
 
@@ -70,6 +68,7 @@ async def process_command(
     max_tokens: int = 1000,
     author: str = None,
     is_regenerate: bool = False,
+    origin_data=None,
 ):
     global histories
 
@@ -100,43 +99,11 @@ async def process_command(
         if len(histories[author]) >= MAX_HISTORY:
             histories[author].pop(0)
 
-    history_description = get_history_description(author=author, history=history)
-
-    await respond_fn(
-        ">>> /{}: temperature={}, history={}, max_tokens={} ```{}``` {}".format(
-            command_name,
-            temperature,
-            history,
-            max_tokens,
-            prompt,
-            "Timeline: ```diff\n{}\n+ user: {}```".format(
-                history_description,
-                cut_string_to_json(prompt),
-            )
-            if len(history_description) > 0
-            else "",
-        ),
-        view=get_buttons(
-            bot=bot,
-            process_command=process_command,
-            command_name=command_name,
-            prompt=prompt,
-            history=history,
-            max_tokens=max_tokens,
-        ),
-    )
-
-    message = await ctx.send("...")
-    answer = ""
-    trim_answer = ""
-    full_answer = ""
-    try:
-        start_time = time.time()
-        options = {
-            **OPENAI_COMPLETION_OPTIONS,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
+    if origin_data is not None:
+        history_description = origin_data["history_description"]
+        messages = origin_data["messages"]
+    else:
+        history_description = get_history_description(author=author, history=history)
         messages = [
             {
                 "role": "system",
@@ -167,6 +134,46 @@ async def process_command(
                 messages.append(msg)
 
         messages.append({"role": "user", "content": prompt})
+
+    await respond_fn(
+        ">>> /{}: temperature={}, history={}, max_tokens={} ```{}``` {}".format(
+            command_name,
+            temperature,
+            history,
+            max_tokens,
+            prompt,
+            "Timeline: ```diff\n{}\n+ user: {}```".format(
+                history_description,
+                cut_string_to_json(prompt),
+            )
+            if len(history_description) > 0
+            else "",
+        ),
+        view=get_buttons(
+            bot=bot,
+            process_command=process_command,
+            command_name=command_name,
+            prompt=prompt,
+            history=history,
+            max_tokens=max_tokens,
+            origin_data={
+                "history_description": history_description,
+                "messages": messages,
+            },
+        ),
+    )
+
+    message = await ctx.send("...")
+    answer = ""
+    trim_answer = ""
+    full_answer = ""
+    try:
+        start_time = time.time()
+        options = {
+            **OPENAI_COMPLETION_OPTIONS,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+        }
 
         if append_to_history:
             histories[author].append(history_message)
