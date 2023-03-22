@@ -1,15 +1,38 @@
+# ChatGPT Discord Bot: **Fast. No daily limits. Special chat modes**
+
 ```diff
 ! I am very interested in this repository, so you don't need to worry if there
 ! hasn't been an update for a while. Simply put, it is still functioning stably
 ! without the need for updates.
 ```
 
-- To deploy the stable version, modify the environment variables in the docker-compose file or replace .env.example with .env to run locally. Execute `docker compose up --build -d` command. I have not had the time to write documentation yet.
-- To add a custom command, simply edit the config file. Don't worry, it will automatically generate the code for you on the first run.
+If you need an additional bot on Telegram, you may like this repository: https://github.com/karfly/chatgpt_telegram_bot
 
 Discord BOT: NullGPT#0657
 
-### Bot commands:
+## Features
+
+- Low latency replies
+- No request limits
+- Message streaming
+- Code highlighting
+- Special chat modes. You can easily create your own chat modes by editing `config.py`
+- The program is lightweight and compact, simply a Python script without any accompanying database or other components.
+- The software has a high level of customization, allowing you to adjust the "temperature" or use a quick selection button for "temperature" if you are not satisfied with the result.
+- Use the "history: number_of_last_messages" option to utilize chat history only when necessary.
+
+## Setup
+
+- To run a local test, simply create a `.env` file and copy the content of the `.env.example` file over. Please note that you need to fill in the API KEY completely. `python main.py`
+- To run on Docker, you need to modify the environment variables in the `docker-compose.yml` file and then run `docker-compose up --build -d`.
+
+## Roadmap
+
+- [x] Special chat modes
+- [ ] Integrate the features of Langchain (https://github.com/hwchase17/langchain) to produce more complex results.
+
+## Bot commands:
+- 
 - /code
 - /assistant
 - /english_translator
@@ -17,10 +40,13 @@ Discord BOT: NullGPT#0657
 - /english_teacher
 - /text_improver
 
-### Options:
+## Options:
+
 - prompt: required
 - temperature: default in config.py
 - history: default 0
 - max_tokens: default 1000
 
-![alt text](asssets/img.png)
+## Youtube video
+
+[![IMAGE ALT TEXT HERE](asssets/img.png)](https://www.youtube.com/watch?v=ZwSu8f1DKmI)
