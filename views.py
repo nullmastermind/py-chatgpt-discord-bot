@@ -36,7 +36,8 @@ def get_buttons(
                 origin_data=origin_data,
             )
 
-        @discord.ui.button(label="0.0 (Precise 🧠)")
+        # @discord.ui.button(label="0.0 (Precise 🧠)")
+        @discord.ui.button(label="0.0")
         async def regenerate_button_callback_00(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.0)
 
@@ -44,7 +45,8 @@ def get_buttons(
         async def regenerate_button_callback_02(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.2)
 
-        @discord.ui.button(label="0.5 (Balanced ⚖️)")
+        # @discord.ui.button(label="0.5 (Balanced ⚖️)")
+        @discord.ui.button(label="0.5")
         async def regenerate_button_callback_05(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.5)
 
@@ -52,7 +54,8 @@ def get_buttons(
         async def regenerate_button_callback_07(self, button, interaction):
             await self.handle(interaction=interaction, temperature=0.7)
 
-        @discord.ui.button(label="1.0 (Creative 🌟)")
+        # @discord.ui.button(label="1.0 (Creative 🌟)")
+        @discord.ui.button(label="1.0")
         async def regenerate_button_callback_10(self, button, interaction):
             await self.handle(interaction=interaction, temperature=1.0)
 
