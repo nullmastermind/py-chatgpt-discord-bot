@@ -109,7 +109,7 @@ async def process_command(
             history,
             max_tokens,
             prompt,
-            "Timeline: ```{}\n+ user: {}```".format(
+            "Timeline: ```diff\n{}\n+ user: {}```".format(
                 history_description,
                 cut_string_to_json(prompt),
             )
