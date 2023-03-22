@@ -1,9 +1,9 @@
 # ChatGPT Discord Bot: **Fast. No daily limits. Special chat modes**
 
 ```diff
-! I am very interested in this repository, so you don't need to worry if there
-! hasn't been an update for a while. Simply put, it is still functioning stably
-! without the need for updates.
++ I am very interested in this repository, so you don't need to worry if there
++ hasn't been an update for a while. Simply put, it is still functioning stably
++ without the need for updates.
 ```
 
 If you need an additional bot on Telegram, you may like this repository: https://github.com/karfly/chatgpt_telegram_bot
