@@ -1,3 +1,6 @@
+import json
+
+
 def is_message_limit(message: str) -> bool:
     if len(message) < 1000:
         return False
@@ -20,3 +23,10 @@ def break_answer(answer: str) -> (str, str):
 
 def preprocess_prompt(prompt: str):
     return prompt.replace("\\n", "\n")
+
+
+def cut_string_to_json(string):
+    if len(string) > 30:
+        string = string[:30] + "..."
+    json_string = json.dumps(string)
+    return json_string
