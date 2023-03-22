@@ -32,7 +32,7 @@ Discord BOT: NullGPT#0657
 - [ ] Integrate the features of Langchain (https://github.com/hwchase17/langchain) to produce more complex results.
 
 ## Bot commands:
-- 
+
 - /code
 - /assistant
 - /english_translator
