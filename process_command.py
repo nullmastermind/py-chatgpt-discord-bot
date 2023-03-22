@@ -194,7 +194,11 @@ async def process_command(
             if len(history_description) > 0
             else "",
         ),
-        view=get_buttons(
+        view=None,
+    )
+
+    buttons = (
+        get_buttons(
             bot=bot,
             process_command=process_command,
             command_name=command_name,
@@ -208,7 +212,6 @@ async def process_command(
             },
         ),
     )
-
     message = await ctx.send("...")
     answer = ""
     trim_answer = ""
@@ -287,7 +290,7 @@ async def process_command(
                         "prompt": prompt,
                     },
                 )
-        await message.edit(content=trim_answer)
+        await message.edit(content=trim_answer, view=buttons)
     except Exception as e:
         trim_answer += "\n\n{}".format(e)
-        await message.edit(content=trim_answer)
+        await message.edit(content=trim_answer, view=buttons)
