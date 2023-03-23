@@ -1,6 +1,11 @@
 import discord
 
 
+class EmptyView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=1)
+
+
 def get_buttons(
     bot,
     process_command,

@@ -30,3 +30,28 @@ def cut_string_to_json(string: str):
     if len(string) > 50:
         string = string[:50] + "..."
     return string
+
+
+def replace_with_characters_map(input_str):
+    characters_map = {
+        "1": "₁",
+        "2": "₂",
+        "3": "₃",
+        "4": "₄",
+        "5": "₅",
+        "6": "₆",
+        "7": "₇",
+        "8": "₈",
+        "9": "₉",
+        "0": "₀",
+        "s": "ₛ",
+        ",": ",",
+        ".": ".",
+    }
+    output_str = ""
+    for char in input_str:
+        if char in characters_map:
+            output_str += characters_map[char]
+        else:
+            output_str += char
+    return output_str

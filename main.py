@@ -53,6 +53,7 @@ async def on_regenerate(
         history=0,
         max_tokens=1000,
         continue_conv=continue_conv,
+        is_regenerate=True,
     )
 
 

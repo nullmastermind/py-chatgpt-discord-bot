@@ -1,3 +1,4 @@
+import asyncio
 import dataclasses
 import json
 import time
@@ -10,7 +11,9 @@ from utility import (
     break_answer,
     preprocess_prompt,
     cut_string_to_json,
+    replace_with_characters_map,
 )
+from views import EmptyView
 
 
 @dataclasses.dataclass
@@ -139,10 +142,12 @@ async def process_command(
     append_to_continue_history = False
 
     if not is_regenerate:
-        if author not in continue_histories or not continue_conv:
+        if author not in continue_histories:
             continue_histories[author] = [history_message]
         elif continue_conv:
             append_to_continue_history = True
+            if len(continue_histories[author]) >= MAX_HISTORY:
+                continue_histories[author].pop(0)
 
     if author not in histories:
         histories[author] = [history_message]
@@ -191,7 +196,13 @@ async def process_command(
                 messages.append(msg)
         else:
             if continue_conv and len(continue_histories[author]) > 0:
-                for msg in continue_histories[author]:
+                continue_messages = []
+                for j in range(len(continue_histories[author]) - 1, -1, -1):
+                    msg = continue_histories[author][j]
+                    continue_messages.insert(0, msg)
+                    if msg.role == "user" and not msg.continue_conv:
+                        break
+                for msg in continue_messages:
                     messages.append(
                         {
                             "role": msg.role,
@@ -218,76 +229,116 @@ async def process_command(
         )
     )
 
-    message = await ctx.send("...")
-    answer = ""
-    trim_answer = ""
+    # print(continue_histories[author])
+
+    message = await ctx.send(content="...")
     full_answer = ""
-    buttons = None
-    try:
-        start_time = time.time()
-        options = {
-            **OPENAI_COMPLETION_OPTIONS,
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
+    start_generate_time = time.time()
 
-        if append_to_history:
-            histories[author].append(history_message)
-        if append_to_continue_history:
-            continue_histories[author].append(history_message)
+    while len(full_answer) == 0:
+        await ctx.channel.trigger_typing()
 
-        for r in openai.ChatCompletion.create(
-            model=MODEL,
-            messages=messages,
-            stream=True,
-            **options,
-        ):
-            if "content" in r.choices[0]["delta"]:
-                stream_message = r.choices[0]["delta"]["content"]
-                answer += stream_message
-                full_answer += stream_message
-                trim_answer = answer.strip()
-                if trim_answer.count("```") % 2 == 1:
-                    trim_answer += "```"
-                if len(trim_answer) > 0 and time.time() - start_time >= 1.0:
-                    start_time = time.time()
-                    if is_message_limit(answer):
-                        answers = break_answer(trim_answer)
-                        await message.edit(content=answers[0])
-                        message = await ctx.send(answers[1])
-                        answer = answers[1]
-                    else:
-                        await message.edit(content=trim_answer + "\n\n...")
-        if len(trim_answer) == 0:
-            trim_answer = "No answer."
-        else:
-            if is_regenerate:
-                for i in range(0, len(histories[author])):
-                    if (
-                        histories[author][i].prompt == prompt
-                        and histories[author][i].role == "assistant"
+        answer = ""
+        trim_answer = ""
+        chunk_answer = ""
+
+        try:
+            start_time = time.time()
+            options = {
+                **OPENAI_COMPLETION_OPTIONS,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+
+            if append_to_history:
+                histories[author].append(history_message)
+            if append_to_continue_history:
+                continue_histories[author].append(history_message)
+
+            stream = await openai.ChatCompletion.acreate(
+                model=MODEL,
+                messages=messages,
+                stream=True,
+                **options,
+            )
+
+            async for r in stream:
+                if "content" in r.choices[0]["delta"]:
+                    stream_message = r.choices[0]["delta"]["content"]
+                    answer += stream_message
+                    chunk_answer += stream_message
+                    full_answer += stream_message
+                    trim_answer = answer.strip()
+                    if trim_answer.count("```") % 2 == 1:
+                        trim_answer += "```"
+                    if len(chunk_answer) >= 100 or (
+                        len(chunk_answer.strip()) > 0
+                        and time.time() - start_time >= 1.0
                     ):
-                        histories[author][i].content = full_answer.strip()
-                        histories[author][i].prompt = prompt.strip()
-                for i in range(0, len(continue_histories[author])):
-                    if (
-                        continue_histories[author][i].prompt == prompt
-                        and continue_histories[author][i].role == "assistant"
-                    ):
-                        continue_histories[author][i].content = full_answer.strip()
-                        continue_histories[author][i].prompt = prompt.strip()
+                        chunk_answer = ""
+                        start_time = time.time()
+                        if is_message_limit(answer):
+                            answers = break_answer(trim_answer)
+                            message = await send_message(
+                                ctx=ctx,
+                                message=message,
+                                content=answers[0],
+                            )
+                            message = await ctx.send(answers[1])
+                            answer = answers[1]
+                        else:
+                            message = await send_message(
+                                ctx=ctx,
+                                message=message,
+                                content=trim_answer,
+                            )
+                        await ctx.channel.trigger_typing()
+            if len(trim_answer) == 0:
+                trim_answer = "No answer."
             else:
-                new_history_item = HistoryItem(
-                    role="assistant",
-                    content=full_answer.strip(),
-                    prompt=prompt,
-                    command=command_name,
-                    continue_conv=continue_conv,
-                    temperature=temperature,
-                )
-                histories[author].append(new_history_item)
-                continue_histories[author].append(new_history_item)
-        await message.edit(content=trim_answer, view=buttons)
-    except Exception as e:
-        trim_answer += "\n\n{}".format(e)
-        await message.edit(content=trim_answer, view=buttons)
+                if is_regenerate:
+                    for i in range(0, len(histories[author])):
+                        if (
+                            histories[author][i].prompt == prompt
+                            and histories[author][i].role == "assistant"
+                        ):
+                            histories[author][i].content = full_answer.strip()
+                            histories[author][i].prompt = prompt.strip()
+                    for i in range(0, len(continue_histories[author])):
+                        if (
+                            continue_histories[author][i].prompt == prompt
+                            and continue_histories[author][i].role == "assistant"
+                        ):
+                            continue_histories[author][i].content = full_answer.strip()
+                            continue_histories[author][i].prompt = prompt.strip()
+                else:
+                    new_history_item = HistoryItem(
+                        role="assistant",
+                        content=full_answer.strip(),
+                        prompt=prompt,
+                        command=command_name,
+                        continue_conv=continue_conv,
+                        temperature=temperature,
+                    )
+                    histories[author].append(new_history_item)
+                    continue_histories[author].append(new_history_item)
+            message = await send_message(ctx=ctx, message=message, content=trim_answer)
+        except Exception as e:
+            trim_answer += "\n\n{}".format(e)
+            message = await send_message(ctx=ctx, message=message, content=trim_answer)
+
+    end_message = await ctx.send(
+        replace_with_characters_map(
+            "{:.2f}s".format(time.time() - start_generate_time)
+        ),
+    )
+    await asyncio.sleep(1)
+    await end_message.delete()
+
+
+async def send_message(ctx, message, content):
+    if message is None:
+        message = await ctx.send(content=content)
+    else:
+        await message.edit(content=content)
+    return message
