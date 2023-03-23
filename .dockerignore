@@ -1,0 +1,15 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore cache and log files
+__pycache__/
+*.log
+
+# Ignore local development files
+venv/
+.env
+
+# Ignore any build artifacts
+build/
+dist/
+*.egg-info/
