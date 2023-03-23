@@ -291,8 +291,6 @@ async def process_command(
             #     **options,
             # )
 
-            print(stream)
-
             async for r in stream:
                 if "content" in r.choices[0]["delta"]:
                     stream_message = r.choices[0]["delta"]["content"]
