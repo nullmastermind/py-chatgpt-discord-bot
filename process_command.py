@@ -5,7 +5,14 @@ import time
 
 import openai
 
-from config import OPENAI_COMPLETION_OPTIONS, CHAT_BOT_NAME, PROMPTS, MODEL, MAX_HISTORY
+from config import (
+    OPENAI_COMPLETION_OPTIONS,
+    CHAT_BOT_NAME,
+    PROMPTS,
+    MODEL,
+    MAX_HISTORY,
+    TIMEOUT,
+)
 from utility import (
     is_message_limit,
     break_answer,
@@ -229,11 +236,19 @@ async def process_command(
         )
     )
 
+    if append_to_history:
+        histories[author].append(history_message)
+    if append_to_continue_history:
+        continue_histories[author].append(history_message)
     # print(continue_histories[author])
 
     message = await ctx.send(content="...")
     full_answer = ""
     start_generate_time = time.time()
+
+    async def overtime():
+        await asyncio.sleep(TIMEOUT)
+        return None
 
     while len(full_answer) == 0:
         await ctx.channel.trigger_typing()
@@ -249,18 +264,34 @@ async def process_command(
                 "temperature": temperature,
                 "max_tokens": max_tokens,
             }
-
-            if append_to_history:
-                histories[author].append(history_message)
-            if append_to_continue_history:
-                continue_histories[author].append(history_message)
-
-            stream = await openai.ChatCompletion.acreate(
-                model=MODEL,
-                messages=messages,
-                stream=True,
-                **options,
+            tasks = [
+                asyncio.create_task(overtime()),
+                asyncio.create_task(
+                    openai.ChatCompletion.acreate(
+                        model=MODEL,
+                        messages=messages,
+                        stream=True,
+                        **options,
+                    )
+                ),
+            ]
+            done, pending = await asyncio.wait(
+                tasks,
+                return_when=asyncio.FIRST_COMPLETED,
             )
+            stream = done.pop().result()
+            if stream is None:
+                # print("retry")
+                continue
+            # stream = await openai.ChatCompletion.acreate(
+            #     model=MODEL,
+            #     messages=messages,
+            #     stream=True,
+            #     timeout=10,
+            #     **options,
+            # )
+
+            print(stream)
 
             async for r in stream:
                 if "content" in r.choices[0]["delta"]:
@@ -324,7 +355,9 @@ async def process_command(
                     continue_histories[author].append(new_history_item)
             message = await send_message(ctx=ctx, message=message, content=trim_answer)
         except Exception as e:
-            trim_answer += "\n\n{}".format(e)
+            error_info = "```{}```".format(e)
+            trim_answer += error_info
+            full_answer += error_info
             message = await send_message(ctx=ctx, message=message, content=trim_answer)
 
     end_message = await ctx.send(

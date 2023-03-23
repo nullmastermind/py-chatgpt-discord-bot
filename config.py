@@ -1,5 +1,7 @@
 MODEL = "gpt-3.5-turbo"
 
+TIMEOUT = 10
+
 OPENAI_COMPLETION_OPTIONS = {
     "max_tokens": 1000,
     "top_p": 1,
