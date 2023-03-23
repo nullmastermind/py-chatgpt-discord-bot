@@ -264,32 +264,24 @@ async def process_command(
                 "temperature": temperature,
                 "max_tokens": max_tokens,
             }
-            tasks = [
-                asyncio.create_task(overtime()),
-                asyncio.create_task(
-                    openai.ChatCompletion.acreate(
-                        model=MODEL,
-                        messages=messages,
-                        stream=True,
-                        **options,
-                    )
-                ),
-            ]
             done, pending = await asyncio.wait(
-                tasks,
+                [
+                    asyncio.create_task(overtime()),
+                    asyncio.create_task(
+                        openai.ChatCompletion.acreate(
+                            model=MODEL,
+                            messages=messages,
+                            stream=True,
+                            **options,
+                        )
+                    ),
+                ],
                 return_when=asyncio.FIRST_COMPLETED,
             )
             stream = done.pop().result()
             if stream is None:
                 # print("retry")
                 continue
-            # stream = await openai.ChatCompletion.acreate(
-            #     model=MODEL,
-            #     messages=messages,
-            #     stream=True,
-            #     timeout=10,
-            #     **options,
-            # )
 
             async for r in stream:
                 if "content" in r.choices[0]["delta"]:
