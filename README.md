@@ -40,6 +40,7 @@ Discord BOT: NullGPT#0657 https://discord.gg/kCwPAGj9Rc
 - /english_teacher
 - /text_improver
 - /show_history <number_of_last_messages>
+- /regenerate: Regenerate the answer with customizable options that can be modified
 
 You can easily add or delete as desired in [config.py](https://github.com/nullmastermind/py-chatgpt-discord-bot/blob/master/config.py)
 

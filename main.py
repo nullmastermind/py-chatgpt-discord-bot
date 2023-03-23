@@ -7,7 +7,13 @@ from dotenv import load_dotenv
 
 from config import PROMPTS
 from generate import generate
-from process_command import process_command, get_history_description
+from process_command import (
+    process_command,
+    get_history_description,
+    histories,
+    get_regenerate_data,
+    HistoryItem,
+)
 
 load_dotenv()
 
@@ -22,6 +28,32 @@ bot = commands.Bot(intents=intents)
 @bot.slash_command(name="start")
 async def on_start(ctx, prompt: str):
     await ctx.respond("Good job! Your prompt: {}".format(prompt))
+
+
+@bot.slash_command(name="regenerate")
+async def on_regenerate(
+    ctx,
+    continue_conv: bool = None,
+    temperature: float = None,
+):
+    author = str(ctx.author)
+    data: HistoryItem = get_regenerate_data(author=author)
+    if data is None:
+        return await ctx.respond("You have no messages.")
+    if temperature is None:
+        temperature = data.temperature
+    if continue_conv is None:
+        continue_conv = data.continue_conv
+    await process_command(
+        bot=bot,
+        command_name=data.command,
+        ctx=ctx,
+        prompt=data.prompt,
+        temperature=temperature,
+        history=0,
+        max_tokens=1000,
+        continue_conv=continue_conv,
+    )
 
 
 @bot.slash_command(name="show_history")

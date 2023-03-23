@@ -20,6 +20,7 @@ class HistoryItem:
     prompt: str = dataclasses.field(default="")
     command: str = dataclasses.field(default="")
     continue_conv: bool = dataclasses.field(default=False)
+    temperature: float = dataclasses.field(default=0.2)
 
 
 histories = {"nil": [HistoryItem(role="user")]}
@@ -76,6 +77,29 @@ def get_history_description(
     return "{}".format("\n".join(str_messages)).strip()
 
 
+def get_regenerate_data(author: str):
+    global histories
+
+    if author not in histories:
+        return None
+
+    while histories[author] and histories[author][-1].role != "user":
+        histories[author].pop()
+
+    if author in continue_histories:
+        while (
+            continue_histories[author] and continue_histories[author][-1].role != "user"
+        ):
+            continue_histories[author].pop()
+        if continue_histories[author]:
+            continue_histories[author].pop()
+
+    if histories[author]:
+        return histories[author].pop()
+
+    return None
+
+
 async def process_command(
     bot,
     command_name: str,
@@ -109,6 +133,7 @@ async def process_command(
         prompt=prompt,
         command=command_name,
         continue_conv=continue_conv,
+        temperature=temperature,
     )
     append_to_history = False
     append_to_continue_history = False
@@ -258,6 +283,7 @@ async def process_command(
                     prompt=prompt,
                     command=command_name,
                     continue_conv=continue_conv,
+                    temperature=temperature,
                 )
                 histories[author].append(new_history_item)
                 continue_histories[author].append(new_history_item)
