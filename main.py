@@ -53,7 +53,7 @@ async def on_regenerate(
         history=0,
         max_tokens=1000,
         continue_conv=continue_conv,
-        is_regenerate=True,
+        is_regenerate=False,
     )
 
 
@@ -65,7 +65,7 @@ async def command_show_history(ctx, history: int):
     if len(history_description) == 0:
         history_description = "There is no message history"
 
-    await ctx.respond("```{}```".format(history_description))
+    await ctx.respond("```diff\n{}```".format(history_description))
 
 
 @bot.slash_command(name="set_openai_api_key")

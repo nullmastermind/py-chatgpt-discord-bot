@@ -1,6 +1,5 @@
 import asyncio
 import dataclasses
-import json
 import time
 
 import openai
@@ -20,7 +19,6 @@ from utility import (
     cut_string_to_json,
     replace_with_characters_map,
 )
-from views import EmptyView
 
 
 @dataclasses.dataclass
@@ -54,11 +52,11 @@ def get_history_description(
             if len(histories[author]) > index >= 0:
                 history_messages.append(
                     {
-                        "role": histories[author][index]["role"],
-                        "content": histories[author][index]["content"],
+                        "role": histories[author][index].role,
+                        "content": histories[author][index].content,
                     }
                 )
-                if histories[author][index]["role"] == "user":
+                if histories[author][index].role == "user":
                     num_pass_his -= 1
         for msg in history_messages[::-1]:
             messages.append(msg)
@@ -240,7 +238,9 @@ async def process_command(
         histories[author].append(history_message)
     if append_to_continue_history:
         continue_histories[author].append(history_message)
-    # print(continue_histories[author])
+
+    history_index = len(histories[author])
+    continue_history_index = len(continue_histories[author])
 
     message = await ctx.send(content="...")
     full_answer = ""
@@ -341,8 +341,13 @@ async def process_command(
                         continue_conv=continue_conv,
                         temperature=temperature,
                     )
-                    histories[author].append(new_history_item)
-                    continue_histories[author].append(new_history_item)
+                    # histories[author].append(new_history_item)
+                    # continue_histories[author].append(new_history_item)
+                    histories[author].insert(history_index, new_history_item)
+                    continue_histories[author].insert(
+                        continue_history_index,
+                        new_history_item,
+                    )
             message = await send_message(ctx=ctx, message=message, content=trim_answer)
         except Exception as e:
             error_info = "```{}```".format(e)
