@@ -66,7 +66,13 @@ def get_history_description(
             and continue_conv
             and len(continue_histories[author]) > 0
         ):
-            for msg in continue_histories[author]:
+            continue_messages = []
+            for j in range(len(continue_histories[author]) - 1, -1, -1):
+                msg = continue_histories[author][j]
+                continue_messages.insert(0, msg)
+                if msg.role == "user" and not msg.continue_conv:
+                    break
+            for msg in continue_messages:
                 messages.append(
                     {
                         "role": msg.role,
@@ -146,13 +152,13 @@ async def process_command(
     append_to_history = False
     append_to_continue_history = False
 
-    if not is_regenerate:
-        if author not in continue_histories:
-            continue_histories[author] = [history_message]
-        elif continue_conv:
+    if author not in continue_histories:
+        continue_histories[author] = [history_message]
+    else:
+        if not is_regenerate:
             append_to_continue_history = True
-            if len(continue_histories[author]) >= MAX_HISTORY:
-                continue_histories[author].pop(0)
+        if len(continue_histories[author]) >= MAX_HISTORY:
+            continue_histories[author].pop(0)
 
     if author not in histories:
         histories[author] = [history_message]
@@ -341,8 +347,6 @@ async def process_command(
                         continue_conv=continue_conv,
                         temperature=temperature,
                     )
-                    # histories[author].append(new_history_item)
-                    # continue_histories[author].append(new_history_item)
                     histories[author].insert(history_index, new_history_item)
                     continue_histories[author].insert(
                         continue_history_index,
