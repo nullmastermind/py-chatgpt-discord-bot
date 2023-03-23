@@ -1,3 +1,5 @@
+import dataclasses
+import json
 import time
 
 import openai
@@ -9,26 +11,19 @@ from utility import (
     preprocess_prompt,
     cut_string_to_json,
 )
-from views import get_buttons
 
-histories = {
-    "nil": [
-        {
-            "role": "user",
-            "content": "",
-            "prompt": "",
-        },
-    ]
-}
-continue_histories = {
-    "nil": [
-        {
-            "role": "user",
-            "content": "",
-            "prompt": "",
-        },
-    ]
-}
+
+@dataclasses.dataclass
+class HistoryItem:
+    role: str = dataclasses.field(default="user")
+    content: str = dataclasses.field(default="")
+    prompt: str = dataclasses.field(default="")
+    command: str = dataclasses.field(default="")
+    continue_conv: bool = dataclasses.field(default=False)
+
+
+histories = {"nil": [HistoryItem(role="user")]}
+continue_histories = {"nil": [HistoryItem(role="user")]}
 
 
 def get_history_description(
@@ -65,8 +60,8 @@ def get_history_description(
             for msg in continue_histories[author]:
                 messages.append(
                     {
-                        "role": msg["role"],
-                        "content": msg["content"],
+                        "role": msg.role,
+                        "content": msg.content,
                     }
                 )
 
@@ -108,11 +103,13 @@ async def process_command(
         return
 
     prompt = preprocess_prompt(prompt)
-    history_message = {
-        "role": "user",
-        "content": prompt,
-        "prompt": prompt,
-    }
+    history_message = HistoryItem(
+        role="user",
+        content=prompt,
+        prompt=prompt,
+        command=command_name,
+        continue_conv=continue_conv,
+    )
     append_to_history = False
     append_to_continue_history = False
 
@@ -159,11 +156,11 @@ async def process_command(
                 if len(histories[author]) > index >= 0:
                     history_messages.append(
                         {
-                            "role": histories[author][index]["role"],
-                            "content": histories[author][index]["content"],
+                            "role": histories[author][index].role,
+                            "content": histories[author][index].content,
                         }
                     )
-                    if histories[author][index]["role"] == "user":
+                    if histories[author][index].role == "user":
                         num_pass_his -= 1
             for msg in history_messages[::-1]:
                 messages.append(msg)
@@ -172,8 +169,8 @@ async def process_command(
                 for msg in continue_histories[author]:
                     messages.append(
                         {
-                            "role": msg["role"],
-                            "content": msg["content"],
+                            "role": msg.role,
+                            "content": msg.content,
                         }
                     )
 
@@ -193,20 +190,7 @@ async def process_command(
             )
             if len(history_description) > 0
             else "",
-        ),
-        view=get_buttons(
-            bot=bot,
-            process_command=process_command,
-            command_name=command_name,
-            prompt=prompt,
-            history=history,
-            max_tokens=max_tokens,
-            origin_data={
-                "history_description": history_description,
-                "messages": messages,
-                "temperature": temperature,
-            },
-        ),
+        )
     )
 
     message = await ctx.send("...")
@@ -255,39 +239,28 @@ async def process_command(
             if is_regenerate:
                 for i in range(0, len(histories[author])):
                     if (
-                        histories[author][i]["prompt"] == prompt
-                        and histories[author][i]["role"] == "assistant"
+                        histories[author][i].prompt == prompt
+                        and histories[author][i].role == "assistant"
                     ):
-                        histories[author][i] = {
-                            "role": "assistant",
-                            "content": full_answer.strip(),
-                            "prompt": prompt,
-                        }
+                        histories[author][i].content = full_answer.strip()
+                        histories[author][i].prompt = prompt.strip()
                 for i in range(0, len(continue_histories[author])):
                     if (
-                        continue_histories[author][i]["prompt"] == prompt
-                        and continue_histories[author][i]["role"] == "assistant"
+                        continue_histories[author][i].prompt == prompt
+                        and continue_histories[author][i].role == "assistant"
                     ):
-                        continue_histories[author][i] = {
-                            "role": "assistant",
-                            "content": full_answer.strip(),
-                            "prompt": prompt,
-                        }
+                        continue_histories[author][i].content = full_answer.strip()
+                        continue_histories[author][i].prompt = prompt.strip()
             else:
-                histories[author].append(
-                    {
-                        "role": "assistant",
-                        "content": full_answer.strip(),
-                        "prompt": prompt,
-                    },
+                new_history_item = HistoryItem(
+                    role="assistant",
+                    content=full_answer.strip(),
+                    prompt=prompt,
+                    command=command_name,
+                    continue_conv=continue_conv,
                 )
-                continue_histories[author].append(
-                    {
-                        "role": "assistant",
-                        "content": full_answer.strip(),
-                        "prompt": prompt,
-                    },
-                )
+                histories[author].append(new_history_item)
+                continue_histories[author].append(new_history_item)
         await message.edit(content=trim_answer, view=buttons)
     except Exception as e:
         trim_answer += "\n\n{}".format(e)
