@@ -248,7 +248,7 @@ async def process_command(
     history_index = len(histories[author])
     continue_history_index = len(continue_histories[author])
 
-    message = await ctx.send(content="...")
+    message = await ctx.send(content="**{}** is typing...".format(CHAT_BOT_NAME))
     full_answer = ""
     start_generate_time = time.time()
 
