@@ -1,5 +1,6 @@
 import asyncio
 import dataclasses
+import math
 import time
 
 import openai
@@ -248,12 +249,34 @@ async def process_command(
     history_index = len(histories[author])
     continue_history_index = len(continue_histories[author])
 
-    message = await ctx.send(content="**{}** is typing...".format(CHAT_BOT_NAME))
+    message = await ctx.send(content="**{}** is thinking...".format(CHAT_BOT_NAME))
     full_answer = ""
     start_generate_time = time.time()
+    is_typing_ready = False
+    start_thinking = time.time()
 
     async def overtime():
-        await asyncio.sleep(TIMEOUT)
+        start_wait = time.time()
+        current_message = "."
+        while "Waiting":
+            if time.time() - start_wait >= TIMEOUT:
+                break
+            if is_typing_ready:
+                break
+            await message.edit(
+                content="**{}** is thinking{} ({}s)".format(
+                    CHAT_BOT_NAME,
+                    current_message,
+                    math.ceil(time.time() - start_thinking),
+                )
+            )
+            if current_message == ".":
+                current_message = ".."
+            elif current_message == "..":
+                current_message = "..."
+            elif current_message == "...":
+                current_message = "."
+            await asyncio.sleep(0.1)
         return None
 
     while len(full_answer) == 0:
@@ -288,6 +311,8 @@ async def process_command(
             if stream is None:
                 # print("retry")
                 continue
+
+            is_typing_ready = True
 
             async for r in stream:
                 if "content" in r.choices[0]["delta"]:
