@@ -24,9 +24,36 @@ intents = discord.Intents.default()
 bot = commands.Bot(intents=intents)
 
 
-@bot.slash_command(name="start")
-async def on_start(ctx, prompt: str):
-    await ctx.respond("Good job! Your prompt: {}".format(prompt))
+@bot.event
+async def on_message(message):
+    from process_command import last_command
+
+    if message.author == bot.user:
+        return
+
+    if last_command is None:
+        command_list = []
+        for k in PROMPTS:
+            command_list.append("`/{}`: {}".format(k, PROMPTS[k]["description"]))
+        await message.channel.send(
+            "You don't have any previous messages. Please use the following command list:\n\n{}".format(
+                "\n".join(command_list)
+            )
+        )
+        return
+
+    # await message.channel.send("hello")
+    await process_command(
+        bot=bot,
+        command_name=last_command.command,
+        ctx=message,
+        prompt=message.content,
+        temperature=last_command.temperature,
+        history=0,
+        max_tokens=last_command.max_tokens,
+        continue_conv=True,
+        is_regenerate=False,
+    )
 
 
 @bot.slash_command(name="regenerate")

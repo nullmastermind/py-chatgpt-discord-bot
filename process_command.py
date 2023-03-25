@@ -23,6 +23,13 @@ from utility import (
 
 
 @dataclasses.dataclass
+class LastCommand:
+    command: str = dataclasses.field(default="")
+    temperature: float = dataclasses.field(default=0.0)
+    max_tokens: int = dataclasses.field(default=1000)
+
+
+@dataclasses.dataclass
 class HistoryItem:
     role: str = dataclasses.field(default="user")
     content: str = dataclasses.field(default="")
@@ -34,6 +41,7 @@ class HistoryItem:
 
 histories = {"nil": [HistoryItem(role="user")]}
 continue_histories = {"nil": [HistoryItem(role="user")]}
+last_command: LastCommand = None
 
 
 def get_history_description(
@@ -128,19 +136,32 @@ async def process_command(
     origin_data=None,
     continue_conv: bool = False,
 ):
-    global histories, continue_histories
+    global histories, continue_histories, last_command
 
     if author is None or len(author) == 0:
         author = str(ctx.author)
 
     valid_ctx = "respond" in dir(ctx)
-    respond_fn = ctx.respond if valid_ctx else ctx.send
+    respond_fn = None
+    send_fn = None
+    if not valid_ctx:
+        if "channel" in dir(ctx) and "send" in dir(ctx.channel):
+            respond_fn = ctx.channel.send
+            send_fn = ctx.channel.send
+    if respond_fn is None:
+        respond_fn = ctx.respond if valid_ctx else ctx.send
+        send_fn = ctx.send
     if openai.api_key is None or len(openai.api_key) < 5:
         await respond_fn(
             "The value of OPENAI_API_KEY is invalid. Please run the command `/set_openai_api_key`"
         )
         return
 
+    last_command = LastCommand(
+        command=command_name,
+        max_tokens=max_tokens,
+        temperature=temperature,
+    )
     prompt = preprocess_prompt(prompt)
     history_message = HistoryItem(
         role="user",
@@ -249,7 +270,7 @@ async def process_command(
     history_index = len(histories[author])
     continue_history_index = len(continue_histories[author])
 
-    message = await ctx.send(content="**{}** is thinking...".format(CHAT_BOT_NAME))
+    message = await send_fn(content="**{}** is thinking...".format(CHAT_BOT_NAME))
     full_answer = ""
     start_generate_time = time.time()
     is_typing_ready = False
@@ -332,15 +353,15 @@ async def process_command(
                         if is_message_limit(answer):
                             answers = break_answer(trim_answer)
                             message = await send_message(
-                                ctx=ctx,
+                                send_fn=send_fn,
                                 message=message,
                                 content=answers[0],
                             )
-                            message = await ctx.send(answers[1])
+                            message = await send_fn(answers[1])
                             answer = answers[1]
                         else:
                             message = await send_message(
-                                ctx=ctx,
+                                send_fn=send_fn,
                                 message=message,
                                 content=trim_answer,
                             )
@@ -377,14 +398,18 @@ async def process_command(
                         continue_history_index,
                         new_history_item,
                     )
-            message = await send_message(ctx=ctx, message=message, content=trim_answer)
+            message = await send_message(
+                send_fn=send_fn, message=message, content=trim_answer
+            )
         except Exception as e:
             error_info = "```{}```".format(e)
             trim_answer += error_info
             full_answer += error_info
-            message = await send_message(ctx=ctx, message=message, content=trim_answer)
+            message = await send_message(
+                send_fn=send_fn, message=message, content=trim_answer
+            )
 
-    end_message = await ctx.send(
+    end_message = await send_fn(
         replace_with_characters_map(
             "{:.2f}s".format(time.time() - start_generate_time)
         ),
@@ -393,9 +418,9 @@ async def process_command(
     await end_message.delete()
 
 
-async def send_message(ctx, message, content):
+async def send_message(send_fn, message, content):
     if message is None:
-        message = await ctx.send(content=content)
+        message = await send_fn(content=content)
     else:
         await message.edit(content=content)
     return message
