@@ -1,3 +1,5 @@
+from discord import Option
+
 MODEL = "gpt-3.5-turbo"
 
 TIMEOUT = 5
@@ -38,6 +40,12 @@ PROMPTS = {
         "content": "As an advanced chatbot named {CHAT_BOT_NAME}, your primary goal is to act as a spoken English teacher and improver. I will speak to you in English and you will reply to me in English to practice my spoken English. I want you to keep your reply neat, limiting the reply to 100 words. I want you to strictly correct my grammar mistakes, typos, and factual errors. I want you to ask me a question in your reply. Now let's start practicing, you could ask me a question first. Remember, I want you to strictly correct my grammar mistakes, typos, and factual errors.",
         "temperature": 0.7,
         "description": "English Teacher",
+        "options": {
+            "prompt": {
+                "name": "topic",
+                "description": "What is the topic of today's lesson?",
+            },
+        },
     },
     "text_improver": {
         "content": "As an advanced chatbot named {CHAT_BOT_NAME}, your primary goal is to correct spelling, fix mistakes and improve text sent by user. Your goal is to edit text, but not to change it's meaning. You can replace simplified A0-level words and sentences with more beautiful and elegant, upper level words and sentences. All your answers strictly follows the structure (keep markdown):\nEdited text:\n```{EDITED TEXT}```\n\nCorrection:\n{NUMBERED LIST OF CORRECTIONS}",

@@ -2,11 +2,11 @@ import os
 
 import discord
 import openai
-from discord import SlashCommand
+from discord import SlashCommand, Option
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from config import PROMPTS
+from config import PROMPTS, MAX_HISTORY
 from process_command import (
     process_command,
     get_history_description,
@@ -83,13 +83,42 @@ async def on_start(ctx, openai_api_key: str):
 
 
 def get_command(name: str):
+    config_options = PROMPTS[name]["options"] if "options" in PROMPTS[name] else {}
+
+    prompt_options = Option(str, description="Prompt", name="prompt")
+    if "prompt" in config_options:
+        prompt_config_options = config_options["prompt"]
+        if "description" in prompt_config_options:
+            prompt_options.description = prompt_config_options["description"]
+        if "name" in prompt_config_options:
+            prompt_options.name = prompt_config_options["name"]
+
     async def _command(
         ctx,
-        prompt: str,
-        continue_conv: bool = False,
-        temperature: float = PROMPTS[name]["temperature"],
-        history: int = 0,
-        max_tokens: int = 1000,
+        prompt: prompt_options,
+        continue_conv: Option(
+            bool, description="Continue conversion", default=False, autocomplete=True
+        ),
+        temperature: Option(
+            float,
+            description="What sampling temperature to use, between 0 and 2. Higher values will make the output more random",
+            default=PROMPTS[name]["temperature"],
+            min_value=0.0,
+            max_value=2.0,
+        ),
+        history: Option(
+            int,
+            description="To continue the conversation, how many previous messages will be used?",
+            min_value=0,
+            default=0,
+            max_value=MAX_HISTORY,
+        ),
+        max_tokens: Option(
+            int,
+            description="The maximum number of tokens to generate in the completion.",
+            default=1000,
+            min_value=1,
+        ),
     ):
         await process_command(
             bot=bot,
