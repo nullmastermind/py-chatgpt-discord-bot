@@ -2,15 +2,14 @@ import os
 
 import discord
 import openai
+from discord import SlashCommand
 from discord.ext import commands
 from dotenv import load_dotenv
 
 from config import PROMPTS
-from generate import generate
 from process_command import (
     process_command,
     get_history_description,
-    histories,
     get_regenerate_data,
     HistoryItem,
 )
@@ -83,14 +82,37 @@ async def on_start(ctx, openai_api_key: str):
     )
 
 
-def run_commands():
-    from generated_commands import generated_commands
+def get_command(name: str):
+    async def _command(
+        ctx,
+        prompt: str,
+        continue_conv: bool = False,
+        temperature: float = PROMPTS[name]["temperature"],
+        history: int = 0,
+        max_tokens: int = 1000,
+    ):
+        await process_command(
+            bot=bot,
+            command_name=name,
+            ctx=ctx,
+            prompt=prompt,
+            temperature=temperature,
+            history=history,
+            max_tokens=max_tokens,
+            continue_conv=continue_conv,
+        )
 
-    generated_commands(bot=bot, process_command=process_command, prompts=PROMPTS)
+    return _command
 
 
-generate()
-run_commands()
+for command_name in PROMPTS:
+    bot.add_application_command(
+        SlashCommand(
+            func=get_command(command_name),
+            name=command_name,
+            description=PROMPTS[command_name]["description"],
+        )
+    )
 
 
 @bot.event
