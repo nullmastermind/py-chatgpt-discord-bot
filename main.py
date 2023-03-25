@@ -43,17 +43,18 @@ async def on_message(message):
         return
 
     # await message.channel.send("hello")
-    await process_command(
-        bot=bot,
-        command_name=last_command.command,
-        ctx=message,
-        prompt=message.content,
-        temperature=last_command.temperature,
-        history=0,
-        max_tokens=last_command.max_tokens,
-        continue_conv=True,
-        is_regenerate=False,
-    )
+    if message.content:
+        await process_command(
+            bot=bot,
+            command_name=last_command.command,
+            ctx=message,
+            prompt=message.content,
+            temperature=last_command.temperature,
+            history=0,
+            max_tokens=last_command.max_tokens,
+            continue_conv=True,
+            is_regenerate=False,
+        )
 
 
 @bot.slash_command(name="regenerate")
