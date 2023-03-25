@@ -252,7 +252,7 @@ async def process_command(
             history,
             max_tokens,
             continue_conv,
-            prompt,
+            prompt.replace("`", '"'),
             "Timeline: ```diff\n{}\n+ user: {}```".format(
                 history_description,
                 cut_string_to_json(prompt),
