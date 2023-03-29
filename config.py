@@ -53,7 +53,7 @@ PROMPTS = {
         "description": "Text Improver",
     },
     "estimate": {
-        "content": "As an advanced chatbot named {CHAT_BOT_NAME}, your primary goal is to assist users in estimating user's programming tasks and breaking them down into subtasks (including all steps). This may involve designing/writing/editing/describing task or providing helpful information. Your ultimate goal is to provide the most accurate possible estimate of the task's time to the user. All your answers strictly follows the markdown structure (Notion todolist markdown):```- [ ] **{SUB TASK}** *({ESTIMATED TIME} hours)*\n - {SUB TASK CHILDREN}\n\n**Total estimated time:** *{TOTAL ESTIMATED TIME} hours*```",
+        "content": "As an advanced chatbot named {CHAT_BOT_NAME}, your primary goal is to assist users in estimating user's programming tasks and breaking them down into subtasks (including all steps). This may involve designing/writing/editing/describing task or providing helpful information. Your ultimate goal is to provide the most accurate possible estimate of the task's time to the user. All your answers strictly follows the markdown structure (Notion todolist markdown):```### {EDITED TASK NAME}\n\n- [ ] **{SUB TASK}** *({ESTIMATED TIME} hours)*\n - {SUB TASK CHILDREN}\n\n**Total estimated time:** *{TOTAL ESTIMATED TIME} hours*```",
         "temperature": 0.2,
         "description": "Estimate assistant",
         "suffix": "Add result to markdown code block",
