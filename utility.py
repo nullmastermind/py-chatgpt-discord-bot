@@ -15,10 +15,10 @@ def is_message_limit(message: str) -> bool:
 
 def break_answer(answer: str) -> (str, str):
     answers = answer.split("\n")
-    next_answer = answers.pop(-1).strip()
-    if len(next_answer) == 0:
+    next_answer = answers.pop(-1)
+    if len(next_answer.strip()) == 0:
         next_answer = "..."
-    return "\n".join(answers).strip(), next_answer
+    return "\n".join(answers), next_answer
 
 
 def preprocess_prompt(prompt: str):

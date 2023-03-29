@@ -244,6 +244,10 @@ async def process_command(
                     )
 
         messages.append({"role": "user", "content": prompt})
+        if "suffix" in PROMPTS[command_name]:
+            messages.append(
+                {"role": "user", "content": PROMPTS[command_name]["suffix"]}
+            )
 
     await respond_fn(
         ">>> /{}: temperature={}, history={}, max_tokens={}, continue_conv={} ```{}``` {}".format(
@@ -418,7 +422,9 @@ async def process_command(
     await end_message.delete()
 
 
-async def send_message(send_fn, message, content):
+async def send_message(send_fn, message, content, copyable: bool = False):
+    if copyable:
+        content = "```{}```".format(content)
     if message is None:
         message = await send_fn(content=content)
     else:
