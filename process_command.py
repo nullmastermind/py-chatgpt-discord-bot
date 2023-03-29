@@ -341,7 +341,7 @@ async def process_command(
                     answer += stream_message
                     chunk_answer += stream_message
                     full_answer += stream_message
-                    trim_answer = answer.strip()
+                    trim_answer = answer
                     if trim_answer.count("```") % 2 == 1:
                         trim_answer += "```"
                     if len(chunk_answer) >= 100 or (
