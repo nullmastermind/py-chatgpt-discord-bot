@@ -41,14 +41,15 @@ Discord BOT: NullGPT#0657 https://discord.gg/kCwPAGj9Rc
 - /text_improver
 - /show_history <number_of_last_messages>
 - /regenerate: Regenerate the answer with customizable options that can be modified
+- /estimate: Task estimate assistant
 
 You can easily add or delete as desired in [config.py](https://github.com/nullmastermind/py-chatgpt-discord-bot/blob/master/config.py)
 
 ## Options:
 
-- continue_conv <True/False>: Continue the conversation
+- continue_conv <True/False>: Whether to continue the previous conversation
 - prompt: required
-- temperature: default in config.py
+- temperature: The temperature to use for message generation. Default in config.py
 - history: default 0. If this option is used, it will disable the 'continue_conv' option.
 - max_tokens: default 1000
 

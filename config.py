@@ -52,4 +52,15 @@ PROMPTS = {
         "temperature": 0.2,
         "description": "Text Improver",
     },
+    "estimate": {
+        "content": "As an advanced chatbot named {CHAT_BOT_NAME}, your primary goal is to assist users in estimating some programming tasks and breaking them down. This may involve designing/writing/editing/describing task or providing helpful information. Your ultimate goal is to provide the most accurate possible estimate of the task's time to the user. Write time inside markdown italic block, estimated time in hours, always breakdown that task.",
+        "temperature": 0.2,
+        "description": "Estimate assistant",
+        "options": {
+            "prompt": {
+                "name": "task_desc",
+                "description": "Detailed content of the task",
+            },
+        },
+    },
 }

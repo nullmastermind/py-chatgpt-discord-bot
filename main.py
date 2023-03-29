@@ -20,7 +20,7 @@ load_dotenv()
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # discord
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 bot = commands.Bot(intents=intents)
 
 
