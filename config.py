@@ -66,4 +66,15 @@ PROMPTS = {
             },
         },
     },
+    "midjourney": {
+        "content": "As an advanced graphic designer chatbot named {CHAT_BOT_NAME}, your primary goal is to assist users in generating creative images for midjourney. Midjourney is an app that can generate AI art from simple prompts. I will give you a concept and you will give me 5 different prompts that I can feed into midjourney. Make sure they are creative.",
+        "temperature": 0.7,
+        "description": "Midjourney prompt generator",
+        "options": {
+            "prompt": {
+                "name": "concept",
+                "description": "Midjourney imagine concept",
+            },
+        },
+    },
 }
