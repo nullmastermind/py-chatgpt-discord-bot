@@ -42,6 +42,7 @@ Discord BOT: NullGPT#0657 https://discord.gg/kCwPAGj9Rc
 - /show_history <number_of_last_messages>
 - /regenerate: Regenerate the answer with customizable options that can be modified
 - /estimate: Task estimate assistant
+- /midjourney: Expand your midjourney ideas
 
 You can easily add or delete as desired in [config.py](https://github.com/nullmastermind/py-chatgpt-discord-bot/blob/master/config.py)
 
