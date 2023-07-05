@@ -1,3 +1,9 @@
+# Please use https://gpt.dongnv.dev instead. repo: https://github.com/nullmastermind/chatgpt-web
+
+
+
+
+
 # ChatGPT Discord Bot: **Fast. No daily limits. Special chat modes**
 
 ```diff
